@@ -1,0 +1,29 @@
+.container {
+    perspective: 1000px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.page {
+    width: 1000px;
+    height: 100vh;
+    margin: auto;
+    background-color: rgb(189, 189, 189);
+    display: flex;
+    flex-wrap: wrap;
+    padding: 24px;
+    justify-content: space-between;
+    align-items: center;
+    // transform: rotate3d(0.2,1,0, 70deg) translate(500px, 0px);
+    transform-origin: 0 0;
+    transform-style: preserve-3d;
+    // transition: all 1s ease-in-out;
+}
+.box {
+    flex-shrink: 0;
+    width: 465px;
+    height: 45%;
+    background-color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+}
