@@ -1,95 +1,119 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, Suspense } from 'react';
 import './App.css';
+
+import { MysteryBox } from './three/objects3D/MysteryBox'
+
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment'
+import Stats from 'three/examples/jsm/libs/stats.module';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+
+import { Canvas } from '@react-three/fiber'
+import Three from './three/Three'
 
 function App() {
 
     const appRef = useRef();
 
     useEffect(() => {
-        if (appRef.current) {
+        if (!appRef.current) return;
 
-            let mixer;
+        let mixer;
 
-            const clock = new THREE.Clock();
-            // SCENE
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xbfe3dd);
+        const clock = new THREE.Clock();
 
+        // const stats = new Stats();
+        // appRef.current.appendChild(stats.dom);
 
-            // CAMERA
-            const camera = new THREE.PerspectiveCamera(25, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 0, 2);
-            camera.lookAt(0, 0, 0);
+        // SCENE
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0ac2f6);
+        // scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
 
-            // RENDERER
-            const renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1;
-            renderer.outputEncoding = THREE.sRGBEncoding
-            appRef.current.appendChild(renderer.domElement);
+        // CAMERA
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const camera = new THREE.PerspectiveCamera(25, w / h, 0.1, 1000);
+        camera.position.set(0, 15, 20);
+        camera.lookAt(0, 0, -1);
 
-            const pmremGenerator = new THREE.PMREMGenerator(renderer);
-            scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+        // RENDERER
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(w, h);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputEncoding = THREE.sRGBEncoding
+        appRef.current.appendChild(renderer.domElement);
 
-            // ORBIT CONTROLS
-            const controls = new OrbitControls(camera, renderer.domElement)
-            controls.target.set(0, 0, 0);
-            controls.update();
-            controls.enablePan = false;
-            controls.enableDamping = true;
+        // handle resize window
+        window.onresize = () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
 
-            // MESH
+            renderer.setSize(newWidth, newHeight);
+            camera.aspect = newWidth / newHeight
+            camera.updateProjectionMatrix()
+        }
 
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
-            // LIGHT
-            // const light = new THREE.DirectionalLight(0xffffff, 1)
-            // light.position.set(0, 0, 1)
-            // scene.add(light)
+        // ORBIT CONTROLS
 
-            // const backlight = new THREE.DirectionalLight(0xffffff, 1)
-            // backlight.position.set(0, 0, -1)
-            // scene.add(backlight)
+        // MESH
 
-            // LOADERS
-            const loader = new GLTFLoader();
+        // LIGHT
+        const ambientLight = new THREE.AmbientLight("#ffffff", 1)
+        scene.add(ambientLight)
 
-            loader.load('/models/source/Persian.glb', (glb) => {
-                console.log(glb)
-                scene.add(glb.scene);
+        // LOADERS
+        const loader = new GLTFLoader();
 
-                mixer = new THREE.AnimationMixer(glb.scene);
-                mixer.clipAction(glb.animations[0]).play();
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('/draco/gltf/')
+        loader.setDRACOLoader(dracoLoader)
 
-                animate()
-            }, (xhr) => {
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-            }, (error) => {
-                console.log(error)
-            })
+        let mysteryBox;
+        loader.load('/models/MysteryBox_22327.gltf', (gltf) => {
+            console.log(gltf)
 
-            // ANIMATED
-            const animate = () => {
-                requestAnimationFrame(animate);
+            mysteryBox = new MysteryBox(gltf)
+            scene.add(mysteryBox.model);
 
-                const delta = clock.getDelta();
-                mixer.update(delta);
+            mysteryBox.fall(() => {
+                mysteryBox.open(() => {
+                    console.log('here')
+                })
+            });
 
-                controls.update()
+            animate()
 
-                renderer.render(scene, camera)
-            }
+        }, undefined, (error) => {
+            console.log(error)
+        })
+
+        // ANIMATED
+        scene.rotation.y = 1
+        const animate = () => {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            mysteryBox.update(delta);
+
+            // controls.update()
+
+            renderer.render(scene, camera)
         }
     }, [])
 
     return (
-        <div ref={appRef} className="App">
-        </div>
+        // <div ref={appRef} className="App"></div>
+        <Canvas id='three-canvas-container' shadows>
+            <Suspense fallback={null}>
+                <Three />
+            </Suspense>
+        </Canvas>
     );
 }
 
