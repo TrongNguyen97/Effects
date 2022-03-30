@@ -28,14 +28,16 @@ export default function Three() {
         const fallAnimate = actions[names[2]]
         const openAnimate = actions[names[0]]
         fallAnimate.loop = THREE.LoopOnce
-        fallAnimate.loop = THREE.LoopOnce
+        openAnimate.loop = THREE.LoopOnce
+
+        fallAnimate.clampWhenFinished = true
+        openAnimate.clampWhenFinished = true
 
         fallAnimate.fadeIn(0.5).play()
         mixer.addEventListener('finished', (e) => {
-            openAnimate.fadeIn(0.5).play()
-            scene.scale = 1
-            
-            // console.log(scene.scale)
+            if (e.action._clip.name === names[2]) {
+                openAnimate.fadeIn(0.5).play()
+            }
         })
         // In the clean-up phase, fade it out
         return () => {
