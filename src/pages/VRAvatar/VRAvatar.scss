@@ -1,0 +1,32 @@
+.container {
+    background-color: #fff;
+    width: 100%;
+
+    .boxImg {
+        width: 1000px;
+        height: 800px;
+        background-color: blue;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    img {
+        position: absolute;
+        width: 16%;
+        transition: all 0.4s;
+
+        &:nth-child(1) {
+            background-color: rosybrown;
+        }
+        &:nth-child(2) {
+            background-color: red;
+        }
+        &:nth-child(3) {
+            background-color: gold;
+        }
+        &:nth-child(4) {
+            background-color: green;
+        }
+    }
+}
