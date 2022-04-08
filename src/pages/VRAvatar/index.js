@@ -3,7 +3,7 @@ import './VRAvatar.scss'
 
 const VRAvatar = () => {
 
-    const [styles, setStyles] = useState([
+    const positions = [
         {
             left: '27%',
             transform: 'scale(1.2)',
@@ -20,84 +20,15 @@ const VRAvatar = () => {
             left: '84%',
             transform: 'scale(1)',
         },
-    ])
+    ]
+
+    const [styles, setStyles] = useState(positions)
 
     const activeTab = (index) => {
-        
-        if(index == 0) setStyles([
-            {
-                left: '27%',
-                transform: 'scale(1.2)',
-            },
-            {
-                left: '0%',
-                transform: 'scale(1)',
-            },
-            {
-                left: '61%',
-                transform: 'scale(0.8)',
-            },
-            {
-                left: '84%',
-                transform: 'scale(1)',
-            },
-        ])
-        if(index == 1) setStyles([
-            {
-                left: '0%',
-                transform: 'scale(1)',
-            },
-            {
-                left: '61%',
-                transform: 'scale(0.8)',
-            },
-            {
-                left: '84%',
-                transform: 'scale(1)',
-            },
-            {
-                left: '27%',
-                transform: 'scale(1.2)',
-            },
-        ])
-        if(index == 2) setStyles([
-            {
-                left: '61%',
-                transform: 'scale(0.8)',
-            },
-            {
-                left: '84%',
-                transform: 'scale(1)',
-            },
-            {
-                left: '27%',
-                transform: 'scale(1.2)',
-            },
-            {
-                left: '0%',
-                transform: 'scale(1)',
-            },
-        ])
-        if(index == 3) setStyles([
-            
-            
-            {
-                left: '84%',
-                transform: 'scale(1)',
-            },
-            {
-                left: '27%',
-                transform: 'scale(1.2)',
-            },
-            {
-                left: '0%',
-                transform: 'scale(1)',
-            },
-            {
-                left: '61%',
-                transform: 'scale(0.8)',
-            },
-        ])
+        let position = [...positions]
+        let pos = position.splice(0,index)
+        // position.splice(0,index)
+        setStyles(position.concat(pos))
     }
 
     return (
